@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { apiConfig } from './config/config';
 import Recipe from './components/Recipe';
 
@@ -8,6 +8,10 @@ function App() {
   const APP_ID = apiConfig.appId;
   const API_KEY = apiConfig.apiKey;
 
+  const inputRef = useRef(null);
+  useEffect(() => {
+    inputRef.current.focus()
+  }, []);
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("banana");
   const [recipes, setRecipes] = useState([]);
@@ -36,7 +40,7 @@ function App() {
   return (
     <div className="App">
       <form onSubmit={getSearch} >
-        <input type="text" value={search} onChange={updateSearch} />
+        <input ref={inputRef} type="text" value={search} onChange={updateSearch} />
         <button type="submit">検索</button>
       </form>
       <div>
