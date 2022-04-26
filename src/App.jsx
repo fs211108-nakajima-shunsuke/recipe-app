@@ -16,11 +16,14 @@ function App() {
   const [query, setQuery] = useState("banana");
   const [recipes, setRecipes] = useState([]);
 
-  const getRecipes = async () => {
-    const response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${API_KEY}`)
-    const data = await response.json();
-    setRecipes(data.hits);
-    console.log(data.hits);
+  const getRecipes = () => {
+    console.log("レシピを読み込みました");
+    fetch(`https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${API_KEY}`)
+    .then(res => res.json())
+    .then(data => {
+        setRecipes(data.hits);
+        console.log(data.hits);
+    });
   };
 
   const getSearch = e => {
