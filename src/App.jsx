@@ -5,8 +5,8 @@ import Recipe from './components/Recipe';
 
 function App() {
 
-  const APP_ID = apiConfig.appId;
-  const API_KEY = apiConfig.apiKey;
+  const EDAMAM_APP_ID = apiConfig.edamamAppId;
+  const EDAMAM_API_KEY = apiConfig.edamamApiKey;
 
   const inputRef = useRef(null);
   useEffect(() => {
@@ -18,7 +18,7 @@ function App() {
 
   const getRecipes = () => {
     console.log("レシピを読み込みました");
-    fetch(`https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${API_KEY}`)
+    fetch(`https://api.edamam.com/search?q=${query}&app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_API_KEY}`)
     .then(res => res.json())
     .then(data => {
         setRecipes(data.hits);
