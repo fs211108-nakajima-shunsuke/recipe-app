@@ -7,6 +7,7 @@ function App() {
 
   const EDAMAM_APP_ID = apiConfig.edamamAppId;
   const EDAMAM_API_KEY = apiConfig.edamamApiKey;
+  const DEEPL_API_KEY = apiConfig.deeplApiKey;
 
   const inputRef = useRef(null);
   useEffect(() => {
@@ -15,15 +16,29 @@ function App() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("banana");
   const [recipes, setRecipes] = useState([]);
+  const [label, setLabel] = useState("");
+
+
+  //改善案
+  //一分ごとにAPIアクセスするとよくないので一括で翻訳する方法を考える
+
+  const getTranslate = (text) => {
+    console.log("翻訳します");
+    fetch(`https://api-free.deepl.com/v2/translate?auth_key=${DEEPL_API_KEY}&text=${text}&target_lang=ja&source_lang=en`)
+      .then(res => res.json())
+      .then(data => setLabel(data.translations[0].text)
+      )
+  };
+
 
   const getRecipes = () => {
     console.log("レシピを読み込みました");
     fetch(`https://api.edamam.com/search?q=${query}&app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_API_KEY}`)
-    .then(res => res.json())
-    .then(data => {
+      .then(res => res.json())
+      .then(data => {
         setRecipes(data.hits);
         console.log(data.hits);
-    });
+      });
   };
 
   const getSearch = e => {
@@ -40,8 +55,13 @@ function App() {
     getRecipes();
   }, [query]);
 
+  useEffect(() => {
+    getTranslate(recipes[0].recipe.label);
+  }, [recipes]);
+
   return (
     <div className="App">
+      {label}
       <form onSubmit={getSearch} >
         <input ref={inputRef} type="text" value={search} onChange={updateSearch} />
         <button type="submit">検索</button>
@@ -50,7 +70,8 @@ function App() {
         {recipes.map(recipe => (
           <Recipe
             key={recipe.recipe.label}
-            title={recipe.recipe.label}
+            // title={recipe.recipe.label}
+            title={label}
             calories={recipe.recipe.calories}
             image={recipe.recipe.image}
             ingredients={recipe.recipe.ingredients}
