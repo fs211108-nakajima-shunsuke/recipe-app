@@ -17,17 +17,13 @@ function App() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("banana");
   const [recipes, setRecipes] = useState([]);
-  const [label, setLabel] = useState("ラベル");
-
-
-  //改善案
-  //一分ごとにAPIアクセスするとよくないので一括で翻訳する方法を考える
+  const [label, setLabel] = useState([]);
 
   const getTranslate = (text) => {
     console.log("翻訳します");
     fetch(`https://api-free.deepl.com/v2/translate?auth_key=${DEEPL_API_KEY}&text=${text}&target_lang=ja&source_lang=en`)
       .then(res => res.json())
-      .then(data => setLabel(data.translations[0].text)
+      .then(data => setLabel(data.translations[0].text.split(","))
       )
   };
 
@@ -60,7 +56,10 @@ function App() {
   useEffect(() => {
     if (renderFlagRef.current) {
       console.log(recipes);
-      getTranslate(recipes[0].recipe.label);
+      const arrayText = recipes.map(recipe => recipe.recipe.label);
+      const joinedText = arrayText.join(",");
+      console.log(joinedText);
+      getTranslate(joinedText);
     } else {
       renderFlagRef.current = true;
     }
@@ -68,17 +67,15 @@ function App() {
 
   return (
     <div className="App">
-      {label}
       <form onSubmit={getSearch} >
         <input ref={inputRef} type="text" value={search} onChange={updateSearch} />
         <button type="submit">検索</button>
       </form>
       <div>
-        {recipes.map((recipe) => (
+        {recipes.map((recipe, index) => (
           <Recipe
             key={recipe.recipe.label}
-            // title={recipe.recipe.label}
-            title={label}
+            title={label[index]}
             calories={recipe.recipe.calories}
             image={recipe.recipe.image}
             ingredients={recipe.recipe.ingredients}
