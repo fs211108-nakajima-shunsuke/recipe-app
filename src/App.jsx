@@ -9,6 +9,7 @@ function App() {
   const EDAMAM_API_KEY = apiConfig.edamamApiKey;
   const DEEPL_API_KEY = apiConfig.deeplApiKey;
 
+  const renderFlagRef = useRef(false);
   const inputRef = useRef(null);
   useEffect(() => {
     inputRef.current.focus()
@@ -16,7 +17,7 @@ function App() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("banana");
   const [recipes, setRecipes] = useState([]);
-  const [label, setLabel] = useState("");
+  const [label, setLabel] = useState("ラベル");
 
 
   //改善案
@@ -31,13 +32,12 @@ function App() {
   };
 
 
-  const getRecipes = () => {
-    console.log("レシピを読み込みました");
-    fetch(`https://api.edamam.com/search?q=${query}&app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_API_KEY}`)
+  const getRecipes = async () => {
+    console.log("レシピを読み込んでいます...");
+     fetch(`https://api.edamam.com/search?q=${query}&app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_API_KEY}`)
       .then(res => res.json())
       .then(data => {
         setRecipes(data.hits);
-        console.log(data.hits);
       });
   };
 
@@ -55,8 +55,15 @@ function App() {
     getRecipes();
   }, [query]);
 
+  //フラグで初回レンダリング時に起動しないように設定
+  //レシピが読み込まれていないとエラーで不具合が出るため
   useEffect(() => {
-    getTranslate(recipes[0].recipe.label);
+    if (renderFlagRef.current) {
+      console.log(recipes);
+      getTranslate(recipes[0].recipe.label);
+    } else {
+      renderFlagRef.current = true;
+    }
   }, [recipes]);
 
   return (
@@ -67,7 +74,7 @@ function App() {
         <button type="submit">検索</button>
       </form>
       <div>
-        {recipes.map(recipe => (
+        {recipes.map((recipe) => (
           <Recipe
             key={recipe.recipe.label}
             // title={recipe.recipe.label}
